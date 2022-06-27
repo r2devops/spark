@@ -69,12 +69,8 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 			}
 		}
 
-		// If no match, do not extract and continue to next language
-		if len(languageData.FilesMatch) == 0 {
-			continue
-		}
-
-		// Extract data
+		// Even if there is no match in filenames, it may be a match in data
+		// extraction file
 		for _, extract := range language.Extract {
 
 			// If extraction file is the current file and complied regex exists
