@@ -39,10 +39,11 @@ func getFileList(dirPath string, subDirsToSkip []string) ([]string, error) {
 				l.WithField("directory", info.Name()).Debug("skipping dir without error")
 				return filepath.SkipDir
 			}
+		} else if info.Mode().IsRegular() {
+			l.Debug("adding file to list: ", path)
+			filesFound = append(filesFound, path)
 		}
 
-		l.Debug("adding file to list: ", path)
-		filesFound = append(filesFound, path)
 		return nil
 	})
 
