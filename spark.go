@@ -94,6 +94,11 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 			}
 		}
 
+		// If no filematch neither data => next language
+		if languageData.Data == nil && languageData.FilesMatch == nil {
+			continue
+		}
+
 		// Append to existing key or create new one
 		if _, ok := result[language.Name]; ok {
 			result[language.Name].FilesMatch = append(result[language.Name].FilesMatch, languageData.FilesMatch...)
