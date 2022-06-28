@@ -29,11 +29,41 @@ languages:
       - Dockerfile
   - name: yarn
     filenames:
-      - yarn.lock
+      - "yarn.lock"
+    extract:
+        - name: test_command
+          file: 'package.json'
+          regex: '"test":.?"(.*)"'
+        - name: lint_command
+          file: 'package.json'
+          regex: '"lint":.*"(.*)"'
+        - name: build_command
+          file: 'package.json'
+          regex: '"build":.*"(.*)"'
+  - name: eslint
+    filenames:
+        - '.eslint\.rc\..*'
   - name: npm
     filenames:
-      - package.json
-      - package-lock.json
+        - "package-lock.json"
+    extract:
+      # When user is using jest in addition to its test command, we want to use jest job
+      - name: jest_command
+        file: 'package.json'
+        regex: '"test":.?"(.*(jest|react-scripts).*)"'
+      - name: test_command
+        file: 'package.json'
+        # We want anything except something related to jest or react-scripts
+        regex: '"test":.?"(?!jest|react-scripts).*",?$'
+      - name: lint_command
+        file: 'package.json'
+        regex: '"lint":.*"(.*)"'
+      - name: build_command
+        file: 'package.json'
+        regex: '"build":.*"(.*)"'
+      - name: eslint_config
+        file: 'package.json'
+        regex: '"eslintConfig":.*"(.*)"'
   - name: mkdocs
     filenames:
       - mkdocs.yml
@@ -95,7 +125,6 @@ languages:
     filenames:
       - opensslv.h
       - packages.config
-    filenames:
       - '^.*\.cmake$'
       - '^.*\.exe$'
       - '^.*\.dll$'
@@ -148,6 +177,9 @@ languages:
   - name: gemfile.lock
     filenames:
       - Gemfile.lock
+  - name: pom
+    filenames:
+      - pom.xml
   - name: gradle
     filenames:
       - '^.*\.gradle$'
