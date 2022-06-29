@@ -62,7 +62,7 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 				continue
 			}
 			if match {
-				l.WithField("filename_regex", filename).Info("regex match !")
+				l.WithField("filename_regex", filename).Debug("regex match !")
 				// Add matching file to
 				languageData.FilesMatch = append(languageData.FilesMatch, filePath)
 				break
@@ -88,7 +88,7 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 					l.WithFields(logrus.Fields{
 						"file":  extract.File,
 						"regex": extract.Regex,
-					}).Info("rexeg doesn't match")
+					}).Debug("rexeg doesn't match")
 
 				}
 			}
@@ -107,6 +107,8 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 			result[language.Name] = &languageData
 		}
 	}
+
+	l.WithField("result", result).Debug("language detection done")
 
 	return result
 }
