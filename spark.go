@@ -26,11 +26,10 @@ type Configuration struct {
 
 type LanguageData struct {
 	FilesMatch []string
-	Data       []*ExtractedData
+	Data       map[string]*ExtractedData
 }
 
 type ExtractedData struct {
-	Name     string
 	Value    string
 	FilePath string
 }
@@ -71,6 +70,7 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 
 		// Even if there is no match in filenames, it may be a match in data
 		// extraction file
+		languageData.Data = make(map[string]*ExtractedData, 0)
 		for _, extract := range language.Extract {
 
 			// If extraction file is the current file and complied regex exists
@@ -79,11 +79,10 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 				result := extract.CompiledRegex.FindSubmatch(content)
 				if result != nil && len(result) > 1 {
 					extractedData := ExtractedData{
-						Name:     extract.Name,
 						Value:    string(result[1]),
 						FilePath: filePath,
 					}
-					languageData.Data = append(languageData.Data, &extractedData)
+					languageData.Data[extract.Name] = &extractedData
 				} else {
 					l.WithFields(logrus.Fields{
 						"file":  extract.File,
@@ -95,14 +94,16 @@ func Analyze(filePath string, content []byte, conf *Configuration) map[string]*L
 		}
 
 		// If no filematch neither data => next language
-		if languageData.Data == nil && languageData.FilesMatch == nil {
+		if len(languageData.Data) == 0 && languageData.FilesMatch == nil {
 			continue
 		}
 
 		// Append to existing key or create new one
 		if _, ok := result[language.Name]; ok {
 			result[language.Name].FilesMatch = append(result[language.Name].FilesMatch, languageData.FilesMatch...)
-			result[language.Name].Data = append(result[language.Name].Data, languageData.Data...)
+			for k, v := range languageData.Data {
+				result[language.Name].Data[k] = v
+			}
 		} else {
 			result[language.Name] = &languageData
 		}

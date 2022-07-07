@@ -113,7 +113,9 @@ func main() {
 
 			if _, ok := techs[tech]; ok {
 				techs[tech].FilesMatch = append(techs[tech].FilesMatch, content.FilesMatch...)
-				techs[tech].Data = append(techs[tech].Data, content.Data...)
+				for k, v := range content.Data {
+					techs[tech].Data[k] = v
+				}
 			} else {
 				techs[tech] = content
 			}
